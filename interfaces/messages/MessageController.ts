@@ -47,11 +47,4 @@ export default interface MessageController {
      */
     deleteAllMessagesOfUser (req: Request, res: Response): void;
 
-    /**
-     * @param {Request} req Represents request from client, including the
-     * path parameters messageid representing the message being updated
-     * @param {Response} res Represents response to client, including status
-     * on whether updating the message was successful or not
-     */
-    updateMessage(req: Request, res: Response): void;
 };

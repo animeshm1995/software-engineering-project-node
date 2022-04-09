@@ -40,12 +40,11 @@ export default class MessageController implements MessageControllerI {
         if(MessageController.messageController === null) {
             MessageController.messageController = new MessageController();
 
-            app.get("/users/:fromuserid/sentmessages", MessageController.messageController.findMessagesSentByUser);
-            app.get("/users/:touserid/receivedmessages", MessageController.messageController.findMessagesReceivedByUser);
-            app.post("/users/:fromuserid/messages/:touserid", MessageController.messageController.messageUser);
-            app.put('/messages/:messageid', MessageController.messageController.updateMessage);
+            app.get("/users/:SourceUserid/sentmessages", MessageController.messageController.findMessagesSentByUser);
+            app.get("/users/:TargetUserid/receivedmessages", MessageController.messageController.findMessagesReceivedByUser);
+            app.post("/users/:SourceUserid/messages/:TargetUserid", MessageController.messageController.messageUser);
             app.delete("/messages/:messageid/", MessageController.messageController.deleteMessage);
-            app.delete("/users/:fromuserid/messages/", MessageController.messageController.deleteAllMessagesOfUser);
+            app.delete("/users/:SourceUserid/messages/", MessageController.messageController.deleteAllMessagesOfUser);
         }
         return MessageController.messageController;
     }
@@ -102,15 +101,5 @@ export default class MessageController implements MessageControllerI {
      */
     deleteAllMessagesOfUser = (req: Request, res: Response) =>
         MessageController.messageDao.deleteAllMessagesOfUser(req.params.fromuserid)
-            .then(status => res.json(status));
-
-    /**
-     * @param {Request} req Represents request from client, including the
-     * path parameters messageid representing the message being updated
-     * @param {Response} res Represents response to client, including status
-     * on whether updating the message was successful or not
-     */
-    updateMessage = (req: Request, res: Response) =>
-        MessageController.messageDao.updateMessage(req.params.messageid, req.body.message)
             .then(status => res.json(status));
 }

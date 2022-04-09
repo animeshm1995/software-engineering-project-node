@@ -44,12 +44,4 @@ export default interface MessageDao {
      * @returns Promise To be notified when message is removed from the database
      */
     deleteAllMessagesOfUser(fromuserid: String): Promise<any>;
-
-    /**
-     * Updates a message in the database.
-     * @param {string} messageid  Primary key of message which has to be updated
-     * @param {string} message  Content of message
-     * @returns Promise To be notified when message is updated in the database
-     */
-    updateMessage(messageid: string, message: string): Promise<any>;
 };
