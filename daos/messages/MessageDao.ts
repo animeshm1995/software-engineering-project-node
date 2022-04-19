@@ -71,13 +71,4 @@ export default class MessageDao implements MessageDaoI {
     deleteAllMessagesOfUser = async ( fromuserid: string): Promise<any> =>
         MessageModel.deleteMany({fromuserid: fromuserid});
 
-    /**
-     * Updates a message in the database.
-     * @param {string} messageid  Primary key of message which has to be updated
-     * @param {string} message  Content of message
-     * @returns Promise To be notified when message is updated in the database
-     */
-    async updateMessage(messageid: string, message: string): Promise<any> {
-        return await MessageModel.updateOne({_id: messageid}, {message: message});
-    }
 }
