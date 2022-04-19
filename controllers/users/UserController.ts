@@ -106,9 +106,18 @@ export default class UserController implements UserControllerI {
      * @param {Response} res Represents response to client, including status
      * on whether updating a user was successful or not
      */
-    updateUser = (req: Request, res: Response) =>
+    updateUser = (req: Request, res: Response) => {
+        // @ts-ignore
+        let userId = req.params.uid === "my" && req.session['profile'] ?
+            // @ts-ignore
+            req.session['profile']._id : req.params.uid;
+        if (userId === "my") {
+            res.sendStatus(503);
+            return;
+        }
         UserController.userDao.updateUser(req.params.uid, req.body)
             .then((status) => res.send(status));
+    }
     
     /**
      * Removes a user instance from the database
@@ -117,10 +126,18 @@ export default class UserController implements UserControllerI {
      * @param {Response} res Represents response to client, including status
      * on whether deleting a user was successful or not
      */
-    deleteUser = (req: Request, res: Response) =>
+    deleteUser = (req: Request, res: Response) => {
+        // @ts-ignore
+        let userId = req.params.uid === "my" && req.session['profile'] ?
+            // @ts-ignore
+            req.session['profile']._id : req.params.uid;
+        if (userId === "my") {
+            res.sendStatus(503);
+            return;
+        }
         UserController.userDao.deleteUser(req.params.uid)
             .then((status) => res.send(status));
-    
+    }
     /**
      * Removes all user instances from the database. Useful for testing
      * @param {Request} req Represents request from client 
