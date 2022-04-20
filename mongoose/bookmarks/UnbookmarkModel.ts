@@ -3,8 +3,8 @@
  * documents in the BookMark collection
  */
 import mongoose from "mongoose";
-import UnbookMarkSchema from "../bookmarks/UnBookmarkSchema";
+import UnbookMarkSchema from "../bookmarks/UnbookMarkSchema";
 
-const UnBookMarkModel = mongoose.model("BookMarkModel", UnbookMarkSchema);
+const UnBookMarkModel = mongoose.model("unBookMarkModel", UnbookMarkSchema);
 
 export default UnBookMarkModel;
