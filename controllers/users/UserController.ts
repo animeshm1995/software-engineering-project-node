@@ -107,10 +107,15 @@ export default class UserController implements UserControllerI {
      * on whether updating a user was successful or not
      */
     updateUser = (req: Request, res: Response) => {
+        console.log("request: ", req.body);
+        console.log("req.params.uid: ", req.params.uid);
+        // @ts-ignore
+        console.log("req.session.uid: ", req.session['profile']);
         // @ts-ignore
         let userId = req.params.uid === "my" && req.session['profile'] ?
             // @ts-ignore
             req.session['profile']._id : req.params.uid;
+        console.log("userId: ", userId);
         if (userId === "my") {
             res.sendStatus(503);
             return;
