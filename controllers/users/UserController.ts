@@ -81,6 +81,15 @@ export default class UserController implements UserControllerI {
      * body formatted as JSON containing the user that matches the user ID
      */
     findUserById = (req: Request, res: Response) => {
+        console.log("request: ", req.body);
+        console.log("req.params.uid: ", req.params.uid);
+        // @ts-ignore
+        console.log("req.session.uid: ", req.session['profile']);
+        // @ts-ignore
+        let userId = req.params.uid === "my" && req.session['profile'] ?
+            // @ts-ignore
+            req.session['profile']._id : req.params.uid;
+        console.log("userId: ", userId);
         // @ts-ignore
         let userId = req.params.uid === "my" && req.session['profile'] ?
             // @ts-ignore
