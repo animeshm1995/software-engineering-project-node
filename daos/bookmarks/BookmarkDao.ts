@@ -3,8 +3,8 @@
  * to integrate with MongoDB
  */
 import BookMarkDaoI from "../../interfaces/bookmarks/BookmarkDao";
-import BookMarkModel from "../../mongoose/bookmarks/BookMarkModel";
-import BookMark from "../../models/bookmarks/BookMark";
+import Bookmark from "../../models/bookmarks/Bookmark";
+import BookmarkModel from "../../mongoose/bookmarks/BookmarkModel";
 
 /**
  * @class BookMarkModel Implements Data Access Object managing data storage
@@ -31,8 +31,8 @@ export default class BookMarkDao implements BookMarkDaoI {
      * @param {string} tid Tuits primary key
      * @returns Promise To be notified when bookmark is retrieved from the database
      */
-    findAllUsersThatBookMarkedTuit = async (tid: string): Promise<BookMark[]> =>
-        BookMarkModel
+    findAllUsersThatBookMarkedTuit = async (tid: string): Promise<Bookmark[]> =>
+        BookmarkModel
             .find({bookMarkedTuit: tid})
             .populate("bookMarkedBy")
             .exec();
@@ -42,8 +42,8 @@ export default class BookMarkDao implements BookMarkDaoI {
      * @param {string} uid Users primary key
      * @returns Promise To be notified when bookmark is retrieved from the database
      */
-    findAllTuitsBookmarkedByUser = async (uid: string): Promise<BookMark[]> =>
-        BookMarkModel
+    findAllTuitsBookmarkedByUser = async (uid: string): Promise<Bookmark[]> =>
+        BookmarkModel
             .find({bookmarkedBy: uid})
             .populate({
                 path: "tuit",
@@ -60,7 +60,7 @@ export default class BookMarkDao implements BookMarkDaoI {
      * @returns Promise To be notified when user bookmark is inserted into the database
      */
     userBookmarkedTuit = async (uid: string, tid: string): Promise<any> =>
-        BookMarkModel.create({bookMarkedTuit: tid, bookMarkedBy: uid});
+        BookmarkModel.create({bookMarkedTuit: tid, bookMarkedBy: uid});
 
     /**
      * Removes bookmarks from the database.
@@ -69,7 +69,7 @@ export default class BookMarkDao implements BookMarkDaoI {
      * @returns Promise To be notified when user bookmark is removed from the database
      */
     userUnBookMarksTuit = async (uid: string, tid: string): Promise<any> =>
-        BookMarkModel.deleteOne({bookMarkedTuit: tid, bookMarkedBy: uid});
+        BookmarkModel.deleteOne({bookMarkedTuit: tid, bookMarkedBy: uid});
 
     /**
      * Check if the user has already bookmarked the tuit
@@ -78,7 +78,7 @@ export default class BookMarkDao implements BookMarkDaoI {
      * @returns Promise To be notified when bookmark is removed from the database
      */
     findUserBookmarksTuit = async (uid: string, tid: string): Promise<any> =>
-        BookMarkModel.findOne({bookMarkedTuit: tid, bookMarkedBy: uid});
+        BookmarkModel.findOne({bookMarkedTuit: tid, bookMarkedBy: uid});
 
     /**
      * Count how many bookmarks this tuit has
@@ -86,6 +86,6 @@ export default class BookMarkDao implements BookMarkDaoI {
      * @returns Promise To be notified when bookmark is removed from the database
      */
     countHowManyBookmarkedTuit = async (tid: string): Promise<any> =>
-        BookMarkModel.count({bookMarkedTuit: tid});
+        BookmarkModel.count({bookMarkedTuit: tid});
 
 }
