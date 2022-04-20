@@ -1,9 +1,11 @@
 /**
- * @file Declares API for Bookmarks related data access object methods
+ * @file Declares API for dislikes related data access object methods
  */
+import UnbookMark from "../../models/bookmarks/Unbookmark";
 import Bookmark from "../../models/bookmarks/Bookmark";
 
-export default interface BookmarkDao {
+
+export default interface UnbookmarkDaoI {
 
     /**
      * Inserts bookmark instance into the database
@@ -11,7 +13,7 @@ export default interface BookmarkDao {
      * @param {string} uid Primary key of tuit which is to be bookmarked
      * @returns Promise To be notified when bookmark is inserted into the database
      */
-    userBookmarkedTuit (tid: string, uid: string): Promise<Bookmark>;
+    userUnbookmarksTuit (tid: string, uid: string): Promise<any>;
 
     /**
      * Removes bookmark from the database.
@@ -19,20 +21,21 @@ export default interface BookmarkDao {
      * @param {string} tid  Primary key of tuit which has to be unbookmarked
      * @returns Promise To be notified when bookmark is removed from the database
      */
-    userUnBookMarksTuit (tid: string, uid: string): Promise<any>;
+    userUndoUnbookmarkTuit (tid: string, uid: string): Promise<any>;
 
     /**
      * Uses BookmarkModel to retrieve all bookmark documents from bookmarks collection
+     * @param {string} tid  Primary key of user whose bookmark is to be removed
      * @param {string} uid  Primary key of user whose bookmark is to be removed
      * @returns Promise To be notified when the bookmarks are retrieved from
      * database
      */
-    findAllTuitsBookmarkedByUser (uid: string): Promise<Bookmark[]>;
+    findUserUnbookmarksTuit (tid: string, uid: string): Promise<UnbookMark>;
 
     /**
      * Removes all bookmarks of that user from the database.
      * @param {string} tid  Primary key of user whose bookmark is to be removed
      * @returns Promise To be notified when bookmark is removed from the database
      */
-    findAllUsersThatBookMarkedTuit (tid: string): Promise<Bookmark[]>;
+    countHowManyUnbookmarkedTuit (tid: string): Promise<any>;
 };

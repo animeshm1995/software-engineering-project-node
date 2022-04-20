@@ -1,68 +1,91 @@
 /**
- * @file Implements API for Bookmarks related data access object methods
+ * @file Implements DAO managing data storage of bookmark. Uses mongoose BookMarkModel
+ * to integrate with MongoDB
  */
-import BookmarkDaoI from "../../interfaces/bookmarks/BookmarkDao";
-import Bookmark from "../../models/bookmarks/Bookmark";
-import BookmarkModel from "../../mongoose/bookmarks/BookmarkModel";
+import BookMarkDaoI from "../../interfaces/bookmarks/BookmarkDao";
+import BookMarkModel from "../../mongoose/bookmarks/BookMarkModel";
+import BookMark from "../../models/bookmarks/BookMark";
 
 /**
- * @class BookmarkDao Implements Data Access Object managing data storage
- * of Bookmarks
- * @property {BookmarkDao} bookmarkDao Private single instance of BookmarkDao
+ * @class BookMarkModel Implements Data Access Object managing data storage
+ * of bookmark
+ * @property {BookMarkModel} bookmarkDao Private single instance of BookMarkModel
  */
-export default class BookmarkDao implements BookmarkDaoI {
-
-    private static bookmarkDao: BookmarkDao | null = null;
+export default class BookMarkDao implements BookMarkDaoI {
+    private static bookmarkDao: BookMarkDao | null = null;
 
     /**
-     * Creates singleton dao instance
-     * @return BookmarkDao
+     * Creates singleton DAO instance
+     * @returns BookMarkDao
      */
-    public static getInstance = (): BookmarkDao => {
-        if(BookmarkDao.bookmarkDao === null) {
-            BookmarkDao.bookmarkDao = new BookmarkDao();
+    public static getInstance = (): BookMarkDao => {
+        if(BookMarkDao.bookmarkDao === null) {
+            BookMarkDao.bookmarkDao = new BookMarkDao();
         }
-        return BookmarkDao.bookmarkDao;
+        return BookMarkDao.bookmarkDao;
     }
-
     private constructor() {}
 
     /**
-     * Inserts bookmark instance into the database
-     * @param {string} userid Primary key of user who adds the bookmark
-     * @param {string} tuitid Primary key of tuit which is to be bookmarked
-     * @returns Promise To be notified when bookmark is inserted into the database
+     * Uses BookMarkModel to retrieve all bookmark document from bookmark collection
+     * @param {string} tid Tuits primary key
+     * @returns Promise To be notified when bookmark is retrieved from the database
      */
-    bookmarkTuit = async (userid: string, tuitid: string): Promise<any> =>
-        BookmarkModel.create({bookmarkedTuit: tuitid, bookmarkedBy: userid});
-
-    /**
-     * Removes bookmark from the database.
-     * @param {string} userid  Primary key of user whose bookmark is to be removed
-     * @param {string} tuitid  Primary key of tuit which has to be unbookmarked
-     * @returns Promise To be notified when bookmark is removed from the database
-     */
-    unbookmarkTuit = async (userid: string, tuitid: string): Promise<any> =>
-        BookmarkModel.deleteOne({bookmarkedTuit: tuitid, bookmarkedBy: userid});
-
-    /**
-     * Uses BookmarkModel to retrieve all bookmark documents from bookmarks collection
-     * @param {string} userid  Primary key of user whose bookmarked tuits are to be fetched
-     * @returns Promise To be notified when the bookmarks are retrieved from
-     * database
-     */
-    findAllBookmarkedTuitsByUser = async (userid: string): Promise<Bookmark[]> =>
-        BookmarkModel
-            .find({bookmarkedBy: userid})
-            .populate("bookmarkedTuit")
+    findAllUsersThatBookMarkedTuit = async (tid: string): Promise<BookMark[]> =>
+        BookMarkModel
+            .find({bookMarkedTuit: tid})
+            .populate("bookMarkedBy")
             .exec();
 
+    /**
+     * Uses BookMarkModel to retrieve all bookmark document from bookmark collection
+     * @param {string} uid Users primary key
+     * @returns Promise To be notified when bookmark is retrieved from the database
+     */
+    findAllTuitsBookmarkedByUser = async (uid: string): Promise<BookMark[]> =>
+        BookMarkModel
+            .find({bookmarkedBy: uid})
+            .populate({
+                path: "tuit",
+                populate: {
+                    path: "postedBy"
+                }
+            })
+            .exec();
 
     /**
-     * Removes all bookmarks of that user from the database.
-     * @param {string} userid  Primary key of user whose bookmark is to be removed
+     * Inserts bookmark instance into the database
+     * @param {string} uid  Primary key of user
+     * @param {string} tid  Primary key of tuit to be bookmarked
+     * @returns Promise To be notified when user bookmark is inserted into the database
+     */
+    userBookmarkedTuit = async (uid: string, tid: string): Promise<any> =>
+        BookMarkModel.create({bookMarkedTuit: tid, bookMarkedBy: uid});
+
+    /**
+     * Removes bookmarks from the database.
+     * @param {string} uid  Primary key of user
+     * @param {string} tid  Primary key of tuit to be unbookmarked
+     * @returns Promise To be notified when user bookmark is removed from the database
+     */
+    userUnBookMarksTuit = async (uid: string, tid: string): Promise<any> =>
+        BookMarkModel.deleteOne({bookMarkedTuit: tid, bookMarkedBy: uid});
+
+    /**
+     * Check if the user has already bookmarked the tuit
+     * @param {string} uid User's primary key
+     * @param {string} tid Tuit's primary key
      * @returns Promise To be notified when bookmark is removed from the database
      */
-    unbookmarkAllTuitsByUser = async (userid: string): Promise<any> =>
-        BookmarkModel.deleteMany({bookmarkedBy: userid});
+    findUserBookmarksTuit = async (uid: string, tid: string): Promise<any> =>
+        BookMarkModel.findOne({bookMarkedTuit: tid, bookMarkedBy: uid});
+
+    /**
+     * Count how many bookmarks this tuit has
+     * @param {string} tid Tuit's primary key
+     * @returns Promise To be notified when bookmark is removed from the database
+     */
+    countHowManyBookmarkedTuit = async (tid: string): Promise<any> =>
+        BookMarkModel.count({bookMarkedTuit: tid});
+
 }
