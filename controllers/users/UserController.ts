@@ -80,9 +80,18 @@ export default class UserController implements UserControllerI {
      * @param {Response} res Represents response to client, including the
      * body formatted as JSON containing the user that matches the user ID
      */
-    findUserById = (req: Request, res: Response) =>
-        UserController.userDao.findUserById(req.params.uid)
+    findUserById = (req: Request, res: Response) => {
+        // @ts-ignore
+        let userId = req.params.uid === "my" && req.session['profile'] ?
+            // @ts-ignore
+            req.session['profile']._id : req.params.uid;
+        if (userId === "my") {
+            res.sendStatus(503);
+            return;
+        }
+        UserController.userDao.findUserById(userId)
             .then((user: User) => res.json(user));
+    }
     
     /**
      * Creates a new user instance
@@ -140,7 +149,7 @@ export default class UserController implements UserControllerI {
             res.sendStatus(503);
             return;
         }
-        UserController.userDao.deleteUser(req.params.uid)
+        UserController.userDao.deleteUser(userId)
             .then((status) => res.send(status));
     }
     /**
