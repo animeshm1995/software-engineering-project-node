@@ -24,6 +24,13 @@ export default interface BookmarkController {
      */
     findAllTuitsBookmarkedByUser(req: Request, res: Response): void;
 
+
+    userBookmarksTuit (req: Request, res: Response): void;
+
+    userUnbookmarksTuit (req: Request, res: Response): void;
+
+    userUnbookmarksAllTuit (req: Request, res: Response): void;
+
     /**
      * Retrieves all tuits that a user bookmarked from the database
      * @param {Request} req Represents request from client, including the path
@@ -32,6 +39,8 @@ export default interface BookmarkController {
      * body formatted as JSON arrays containing the tuit objects that were bookmarked
      */
     userTogglesTuitBookMarks(req: Request, res: Response): void;
+
+    findUserBookmarkedTuit (req: Request, res: Response): void;
 
    // unbookmarkAllTuitsByUser (req: Request, res: Response): void;
 

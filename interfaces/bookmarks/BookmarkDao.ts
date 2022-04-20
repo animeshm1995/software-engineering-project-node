@@ -11,7 +11,7 @@ export default interface BookmarkDao {
      * @param {string} uid Primary key of tuit which is to be bookmarked
      * @returns Promise To be notified when bookmark is inserted into the database
      */
-    userBookmarkedTuit (tid: string, uid: string): Promise<Bookmark>;
+    userBookmarksTuit (tid: string, uid: string): Promise<Bookmark>;
 
     /**
      * Removes bookmark from the database.
@@ -20,6 +20,9 @@ export default interface BookmarkDao {
      * @returns Promise To be notified when bookmark is removed from the database
      */
     userUnBookMarksTuit (tid: string, uid: string): Promise<any>;
+
+
+    userUnbookmarksAllTuit (uid: string): Promise<any>;
 
     /**
      * Uses BookmarkModel to retrieve all bookmark documents from bookmarks collection

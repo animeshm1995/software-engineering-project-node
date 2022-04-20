@@ -36,10 +36,16 @@ export default class BookMarkController implements BookMarkControllerI {
     public static getInstance = (app: Express): BookMarkController => {
         if(BookMarkController.bookmarkController === null) {
             BookMarkController.bookmarkController = new BookMarkController();
-            app.get("/api/tuits/:tid/bookmark", BookMarkController.bookmarkController.findAllUsersThatBookMarkedTuit);
-            app.get("/api/users/:uid/bookmark", BookMarkController.bookmarkController.findAllTuitsBookmarkedByUser);
-            //app.post("/api/users/:uid/bookmarks/:tid", BookMarkController.bookmarkController.userBookmarkedTuit);
+
+
+            app.get("/api/users/:uid/bookmarks", BookMarkController.bookmarkController.findAllTuitsBookmarkedByUser);
+            app.get("/api/tuits/:tid/bookmarks", BookMarkController.bookmarkController.findAllUsersThatBookMarkedTuit);
+            app.post("/api/users/:uid/bookmarks/:tid", BookMarkController.bookmarkController.userBookmarksTuit);
+            app.delete("/api/users/:uid/bookmarks/:tid", BookMarkController.bookmarkController.userUnbookmarksTuit);
+            app.delete("/api/users/:uid/bookmarks", BookMarkController.bookmarkController.userUnbookmarksAllTuit);
             app.put("/api/users/:uid/bookmarks/:tid", BookMarkController.bookmarkController.userTogglesTuitBookMarks);
+            app.get("/api/users/:uid/bookmarks/:tid", BookMarkController.bookmarkController.findUserBookmarkedTuit);
+
         }
         return BookMarkController.bookmarkController;
     }
@@ -55,7 +61,7 @@ export default class BookMarkController implements BookMarkControllerI {
      */
     findAllUsersThatBookMarkedTuit = (req: Request, res: Response) =>
         BookMarkController.bookmarkDao.findAllUsersThatBookMarkedTuit(req.params.tid)
-            .then(bookmark => res.json(bookmark));
+            .then(users => res.json(users));
 
     /**
      * Retrieves all tuits bookmarked by a user from the database
@@ -70,15 +76,22 @@ export default class BookMarkController implements BookMarkControllerI {
         const profile = req.session['profile'];
         const userId = uid === 'me' && profile ?
             profile._id : uid;
-
-        BookMarkController.bookmarkDao.findAllTuitsBookmarkedByUser(userId)
-            .then(bookmark => {
-                // filter out likes with null tuits. Only keep defined tuits
-                // extract tuit object from likes respond with tuits
-                const bookmarksNonNullTuits = bookmark.filter(bookmark => bookmark.bookmarkedTuit);
-                const tuitsFromBookmarks = bookmarksNonNullTuits.map(bookmark => bookmark.bookmarkedTuit);
-                res.json(tuitsFromBookmarks);
-            });
+        if (userId === "me") {
+            res.sendStatus(503);
+            return;
+        }
+        try {
+            BookMarkController.bookmarkDao.findAllTuitsBookmarkedByUser(userId)
+                .then(bookmarks => {
+                    // filter out likes with null tuits. Only keep defined tuits
+                    // extract tuit object from likes respond with tuits
+                    const bookmarksNonNullTuits = bookmarks.filter(bookmark => bookmark.bookmarkedTuit);
+                    const tuitsFromBookmarks = bookmarksNonNullTuits.map(bookmark => bookmark.bookmarkedTuit);
+                    res.json(tuitsFromBookmarks);
+                });
+        } catch (e) {
+            res.sendStatus(404);
+        }
     }
 
 
@@ -90,9 +103,31 @@ export default class BookMarkController implements BookMarkControllerI {
      * body formatted as JSON containing the new bookmarked that was inserted in the
      * database
      */
-    userBookmarkedTuit = (req: Request, res: Response) =>
-        BookMarkController.bookmarkDao.userBookmarkedTuit(req.params.uid, req.params.tid)
-            .then(bookmark => res.json(bookmark));
+    userBookmarksTuit = (req: Request, res: Response) =>
+        BookMarkController.bookmarkDao.userBookmarksTuit(req.params.uid, req.params.tid)
+            .then(bookmarks => res.json(bookmarks));
+
+    /**
+     * @param {Request} req Represents request from client, including the
+     * path parameters uid and tid representing the user that is unbookmarking
+     * the tuit and the tuit being bookmarked
+     * @param {Response} res Represents response to client, including status
+     * on whether deleting the bookmark was successful or not
+     */
+    userUnbookmarksTuit = (req: Request, res: Response) =>
+        BookMarkController.bookmarkDao.userUnBookMarksTuit(req.params.uid, req.params.tid)
+            .then(status => res.send(status));
+
+    /**
+     * @param {Request} req Represents request from client, including the
+     * path parameters uid and tid representing the user that is unbookmarking
+     * the tuit and the tuits being bookmarked
+     * @param {Response} res Represents response to client, including status
+     * on whether deleting the bookmark was successful or not
+     */
+    userUnbookmarksAllTuit = (req: Request, res: Response) =>
+        BookMarkController.bookmarkDao.userUnbookmarksAllTuit(req.params.uid)
+            .then(status => res.send(status));
 
     /**
      * @param {Request} req Represents request from client, including the
@@ -110,6 +145,10 @@ export default class BookMarkController implements BookMarkControllerI {
         const profile = req.session['profile'];
         const userId = uid === 'me' && profile ?
             profile._id : uid;
+        if (userId === "me") {
+            res.sendStatus(503);
+            return;
+        }
         try {
             const userAlreadyBookmarkedTuit = await bookMarkDao.findUserBookmarksTuit(userId, tid);
             const howManyBookmarkedTuit = await bookMarkDao.countHowManyBookmarkedTuit(tid);
@@ -118,7 +157,7 @@ export default class BookMarkController implements BookMarkControllerI {
                 await bookMarkDao.userUnBookMarksTuit(userId, tid);
                 tuit.stats.bookmarks = howManyBookmarkedTuit - 1;
             } else {
-                await BookMarkController.bookmarkDao.userBookmarkedTuit(userId, tid);
+                await BookMarkController.bookmarkDao.userBookmarksTuit(userId, tid);
                 tuit.stats.bookmarks = howManyBookmarkedTuit + 1;
             }
             await tuitDao.updateBookmarks(tid, tuit.stats);
@@ -126,5 +165,27 @@ export default class BookMarkController implements BookMarkControllerI {
         } catch (e) {
             res.sendStatus(404);
         }
+    }
+
+    /**
+     * Check if the user has already bookmarked the tuit
+     * @param {Request} req Represents request from client, including the path
+     * parameter uid representing the user, and the tid representing the tuit
+     * @param {Response} res Represents response to client, including the
+     * body formatted as JSON object containing the bookmark objects or null
+     */
+    findUserBookmarkedTuit = async (req: Request, res: Response) => {
+        const uid = req.params.uid;
+        const tid = req.params.tid;
+        // @ts-ignore
+        const profile = req.session['profile'];
+        const userId = uid === 'me' && profile ?
+            profile._id : uid;
+        if (userId === "me") {
+            res.sendStatus(503);
+            return;
+        }
+        BookMarkController.bookmarkDao.findUserBookmarksTuit(userId, tid)
+            .then(bookmark => res.json(bookmark));
     }
 };

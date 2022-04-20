@@ -45,12 +45,7 @@ export default class BookMarkDao implements BookMarkDaoI {
     findAllTuitsBookmarkedByUser = async (uid: string): Promise<Bookmark[]> =>
         BookmarkModel
             .find({bookmarkedBy: uid})
-            .populate({
-                path: "tuit",
-                populate: {
-                    path: "postedBy"
-                }
-            })
+            .populate("bookmarkedTuit")
             .exec();
 
     /**
@@ -59,7 +54,7 @@ export default class BookMarkDao implements BookMarkDaoI {
      * @param {string} tid  Primary key of tuit to be bookmarked
      * @returns Promise To be notified when user bookmark is inserted into the database
      */
-    userBookmarkedTuit = async (uid: string, tid: string): Promise<any> =>
+    userBookmarksTuit = async (uid: string, tid: string): Promise<any> =>
         BookmarkModel.create({bookMarkedTuit: tid, bookMarkedBy: uid});
 
     /**
@@ -70,6 +65,15 @@ export default class BookMarkDao implements BookMarkDaoI {
      */
     userUnBookMarksTuit = async (uid: string, tid: string): Promise<any> =>
         BookmarkModel.deleteOne({bookMarkedTuit: tid, bookMarkedBy: uid});
+
+
+    /**
+     * Remove all bookmark instances from the database bookmarked by a user
+     * @param {string} uid User's primary key
+     * @returns Promise To be notified when bookmarks are removed from the database
+     */
+    userUnbookmarksAllTuit = async (uid: string): Promise<any> =>
+        BookmarkModel.deleteMany({bookmarkedBy: uid})
 
     /**
      * Check if the user has already bookmarked the tuit
