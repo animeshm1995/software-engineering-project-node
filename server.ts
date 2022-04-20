@@ -30,13 +30,14 @@ import SessionController from "./controllers/session/SessionController";
 import DislikeController from "./controllers/dislikes/DislikeController";
 
 const app = express();
+require('dotenv').config();
 app.use(cors({
     credentials: true,
     origin: process.env.CORS_ORIGIN
 }));
 
 let sess = {
-    secret: process.env.EXPRESS_SESSION_SECRET,
+    secret: 'my-secret-key',
     saveUninitialized: true,
     resave: true,
     cookie: {

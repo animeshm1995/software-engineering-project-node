@@ -120,7 +120,7 @@ export default class UserController implements UserControllerI {
             res.sendStatus(503);
             return;
         }
-        UserController.userDao.updateUser(req.params.uid, req.body)
+        UserController.userDao.updateUser(userId, req.body)
             .then((status) => res.send(status));
     }
     
