@@ -13,7 +13,7 @@ export default interface BookmarkController {
      * body formatted as JSON containing the new bookmark that was inserted in the
      * database
      */
-    bookmarkTuit (req: Request, res: Response): void;
+    findAllUsersThatBookMarkedTuit(req: Request, res: Response): void;
 
     /**
      * @param {Request} req Represents request from client, including the
@@ -22,7 +22,7 @@ export default interface BookmarkController {
      * @param {Response} res Represents response to client, including status
      * on whether deleting the bookmark was successful or not
      */
-    unbookmarkTuit (req: Request, res: Response): void;
+    findAllTuitsBookmarkedByUser(req: Request, res: Response): void;
 
     /**
      * Retrieves all tuits that a user bookmarked from the database
@@ -31,15 +31,8 @@ export default interface BookmarkController {
      * @param {Response} res Represents response to client, including the
      * body formatted as JSON arrays containing the tuit objects that were bookmarked
      */
-    findAllBookmarkedTuitsByUser (req: Request, res: Response): void;
+    userTogglesTuitBookMarks(req: Request, res: Response): void;
 
-    /**
-     * Retrieves all tuits that a user bookmarked from the database
-     * @param {Request} req Represents request from client, including the path
-     * parameter userid representing the user who bookmarked the tuits
-     * @param {Response} res Represents response to client, including the
-     * body formatted as JSON arrays containing the tuit objects that were bookmarked
-     */
-    unbookmarkAllTuitsByUser (req: Request, res: Response): void;
+   // unbookmarkAllTuitsByUser (req: Request, res: Response): void;
 
 };
