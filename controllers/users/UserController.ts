@@ -80,9 +80,27 @@ export default class UserController implements UserControllerI {
      * @param {Response} res Represents response to client, including the
      * body formatted as JSON containing the user that matches the user ID
      */
-    findUserById = (req: Request, res: Response) =>
-        UserController.userDao.findUserById(req.params.uid)
+    findUserById = (req: Request, res: Response) => {
+        console.log("request: ", req.body);
+        console.log("req.params.uid: ", req.params.uid);
+        // @ts-ignore
+        console.log("req.session.uid: ", req.session['profile']);
+        // @ts-ignore
+        let userId = req.params.uid === "my" && req.session['profile'] ?
+            // @ts-ignore
+            req.session['profile']._id : req.params.uid;
+        console.log("userId: ", userId);
+        // @ts-ignore
+        let userId = req.params.uid === "my" && req.session['profile'] ?
+            // @ts-ignore
+            req.session['profile']._id : req.params.uid;
+        if (userId === "my") {
+            res.sendStatus(503);
+            return;
+        }
+        UserController.userDao.findUserById(userId)
             .then((user: User) => res.json(user));
+    }
     
     /**
      * Creates a new user instance
@@ -120,7 +138,7 @@ export default class UserController implements UserControllerI {
             res.sendStatus(503);
             return;
         }
-        UserController.userDao.updateUser(req.params.uid, req.body)
+        UserController.userDao.updateUser(userId, req.body)
             .then((status) => res.send(status));
     }
     
@@ -140,7 +158,7 @@ export default class UserController implements UserControllerI {
             res.sendStatus(503);
             return;
         }
-        UserController.userDao.deleteUser(req.params.uid)
+        UserController.userDao.deleteUser(userId)
             .then((status) => res.send(status));
     }
     /**
