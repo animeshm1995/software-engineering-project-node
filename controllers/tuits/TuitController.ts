@@ -96,6 +96,10 @@ export default class TuitController implements TuitControllerI {
      * database
      */
     createTuitByUser = (req: Request, res: Response) => {
+        console.log("request: ", req.body);
+        console.log("req.params.uid: ", req.params.uid);
+        // @ts-ignore
+        console.log("req.session.uid: ", req.session['profile']);
         // @ts-ignore
         let userId = req.params.uid === "my" && req.session['profile'] ?
             // @ts-ignore
