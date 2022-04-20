@@ -5,7 +5,7 @@ import mongoose, {Schema} from "mongoose";
 import UnbookMark from "../../models/bookmarks/Unbookmark";
 
 /**
- * @typedef UnBookMark Represents Unbookmark made on tuit
+ * @typedef UnbookMark Represents Unbookmark made on tuit
  * @property {ObjectId[]} UnbookMarkedTuit Array of Tuit IDs
  * @property {ObjectId[]} UnbookMarkedBy Array of BookMark IDs
  */
