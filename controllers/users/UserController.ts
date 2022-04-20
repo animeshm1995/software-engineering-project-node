@@ -97,7 +97,7 @@ export default class UserController implements UserControllerI {
         console.log("Animesh after user id");
         UserController.userDao.findUserById(userId)
             .then((user: User) => {
-                console.log("res: ", res);
+                console.log("user: ", user);
                 res.json(user)});
     }
     
