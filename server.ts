@@ -18,6 +18,7 @@ import express from 'express';
 import mongoose from "mongoose";
 const cors = require("cors");
 const session = require("express-session");
+const compression = require('compression')
 
 import UserController from "./controllers/users/UserController";
 import TuitController from "./controllers/tuits/TuitController";
@@ -30,6 +31,7 @@ import SessionController from "./controllers/session/SessionController";
 import DislikeController from "./controllers/dislikes/DislikeController";
 
 const app = express();
+
 require('dotenv').config();
 app.use(cors({
     credentials: true,
@@ -53,7 +55,9 @@ if (process.env.NODE_ENV === 'production') {
 // connect to the database
 mongoose.connect('mongodb+srv://cs5500:Spring2022@cluster0.lgzrz.mongodb.net/tuiter?retryWrites=true&w=majority');
 app.use(session(sess))
-app.use(express.json());
+//app.use(express.json());
+app.use(express.json({limit: '25mb'}));
+app.use(express.urlencoded({limit: '25mb'}));
 
 app.get('/hello', (req, res) =>
     res.send('Hello World!'));
