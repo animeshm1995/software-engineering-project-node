@@ -33,7 +33,7 @@ export default class BookMarkDao implements BookMarkDaoI {
      */
     findAllUsersThatBookMarkedTuit = async (tid: string): Promise<Bookmark[]> =>
         BookmarkModel
-            .find({bookMarkedTuit: tid})
+            .find({bookmarkedTuit: tid})
             .populate("bookMarkedBy")
             .exec();
 
@@ -55,7 +55,7 @@ export default class BookMarkDao implements BookMarkDaoI {
      * @returns Promise To be notified when user bookmark is inserted into the database
      */
     userBookmarksTuit = async (uid: string, tid: string): Promise<any> =>
-        BookmarkModel.create({bookMarkedTuit: tid, bookMarkedBy: uid});
+        BookmarkModel.create({bookmarkedTuit: tid, bookmarkedBy: uid});
 
     /**
      * Removes bookmarks from the database.
@@ -64,7 +64,7 @@ export default class BookMarkDao implements BookMarkDaoI {
      * @returns Promise To be notified when user bookmark is removed from the database
      */
     userUnBookMarksTuit = async (uid: string, tid: string): Promise<any> =>
-        BookmarkModel.deleteOne({bookMarkedTuit: tid, bookMarkedBy: uid});
+        BookmarkModel.deleteOne({bookmarkedTuit: tid, bookmarkedBy: uid});
 
 
     /**
@@ -82,7 +82,7 @@ export default class BookMarkDao implements BookMarkDaoI {
      * @returns Promise To be notified when bookmark is removed from the database
      */
     findUserBookmarksTuit = async (uid: string, tid: string): Promise<any> =>
-        BookmarkModel.findOne({bookMarkedTuit: tid, bookMarkedBy: uid});
+        BookmarkModel.findOne({bookmarkedTuit: tid, bookmarkedBy: uid});
 
     /**
      * Count how many bookmarks this tuit has
@@ -90,6 +90,6 @@ export default class BookMarkDao implements BookMarkDaoI {
      * @returns Promise To be notified when bookmark is removed from the database
      */
     countHowManyBookmarkedTuit = async (tid: string): Promise<any> =>
-        BookmarkModel.count({bookMarkedTuit: tid});
+        BookmarkModel.count({bookmarkedTuit: tid});
 
 }
